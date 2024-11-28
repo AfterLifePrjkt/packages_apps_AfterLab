@@ -20,11 +20,16 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.hardware.display.DisplayManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.SearchIndexableResource;
 import android.provider.Settings;
+
+import android.util.DisplayMetrics;
+import android.util.Slog;
+import android.view.Display;
 
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -40,6 +45,7 @@ import com.android.internal.logging.nano.MetricsProto;
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
 import com.android.settings.search.BaseSearchIndexProvider;
+import com.android.settingslib.display.DisplayDensityConfiguration;
 import com.android.settingslib.search.Indexable;
 import com.android.settingslib.search.SearchIndexable;
 
@@ -69,16 +75,64 @@ public class QuickSettings extends SettingsPreferenceFragment
         Context mContext = getActivity().getApplicationContext();
         ContentResolver resolver = mContext.getContentResolver();
 
-        if (preference == mAflQsCustom) {
+    if (preference == mAflQsCustom) {
         int value = Integer.parseInt((String) newValue);
-        if (value == 1 || value == 2) {
-            Settings.Secure.putIntForUser(resolver,
-                Settings.Secure.QS_SHOW_BRIGHTNESS_SLIDER, 0, UserHandle.USER_CURRENT);
+
+        final int defaultSwDp = 450;
+
+        try {
+            final Resources res = mContext.getResources();
+            final DisplayMetrics metrics = res.getDisplayMetrics();
+            final int minDimensionPx = Math.min(metrics.widthPixels, metrics.heightPixels);
+
+            if (value == 1 || value == 2) {
+                final int newSwDp = defaultSwDp;
+                final int newDensity = DisplayMetrics.DENSITY_MEDIUM * minDimensionPx / newSwDp;
+                final int densityDpi = Math.max(newDensity, 120);
+
+                DisplayDensityConfiguration.setForcedDisplayDensity(
+                    Display.DEFAULT_DISPLAY,
+                    densityDpi
+                );
+
+                Settings.System.putInt(resolver, "density", densityDpi);
+
+                Settings.Secure.putIntForUser(
+                    resolver,
+                    Settings.Secure.QS_SHOW_BRIGHTNESS_SLIDER,
+                    0,
+                    UserHandle.USER_CURRENT
+                );
+            } 
+
+            else if (value == 0) {
+                final int defaultDensity = 400;
+
+                DisplayDensityConfiguration.setForcedDisplayDensity(
+                    Display.DEFAULT_DISPLAY,
+                    defaultDensity
+                );
+
+                Settings.System.putInt(resolver, "density", defaultDensity);
+
+                Settings.Secure.putIntForUser(
+                    resolver,
+                    Settings.Secure.QS_SHOW_BRIGHTNESS_SLIDER,
+                    1,
+                    UserHandle.USER_CURRENT
+                );
             }
-            return true;
+        } catch (Exception e) {
+            Slog.e("DensityPreference", "Error changing DPI", e);
+            return false;
         }
-        return false;
-    } 
+
+        return true;
+    }
+
+    return false;
+}
+
     
     @Override
     public int getMetricsCategory() {

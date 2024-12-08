@@ -785,4 +785,9 @@
     <string name="all_props_title">Enable spoof options</string>
     <string name="all_props_summary">Enables all the spoof options within the PixelProps</string>
 
+    <!-- Extras menu -->
+    <string name="extras_category">Extras</string>
+    <string name="sidebar_title">Sidebar</string>
+    <string name="sidebar_summary">Quickly open apps in a floating window</string>
+
 </resources>

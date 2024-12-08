@@ -46,7 +46,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:key="sound_category">
+        android:key="sound_category"
         android:title="@string/sound_category">
 
         <!-- AfterEchoe -->
@@ -62,6 +62,23 @@
                 android:targetClass="com.afterlifeos.echo.after.DolbyActivity" />
 
          </Preference>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="extras_category"
+        android:title="@string/extras_category">
+
+        <Preference
+            android:key="sidebar"
+            android:title="@string/sidebar_title"
+            android:summary="@string/sidebar_summary"
+            settings:layout="@layout/afterlab_card_preference_single">
+            <intent
+                android:action="android.intent.action.IA_SETTINGS"
+                android:targetPackage="com.libremobileos.sidebar"
+                android:targetClass="com.libremobileos.sidebar.ui.sidebar.SidebarSettingsActivity" />
+        </Preference>
 
     </PreferenceCategory>
 

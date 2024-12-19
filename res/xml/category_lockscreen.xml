@@ -40,7 +40,7 @@
           settings:layout="@layout/afterlab_card_preference_middle"
           android:defaultValue="0" />
 
-     <com.afterlife.support.preference.SecureSettingSwitchPreference
+     <com.afterlife.support.preference.SystemSettingSwitchPreference
           android:key="secure_lockscreen_qs_disabled"
           android:title="@string/disable_qs_title"
           android:summary="@string/disable_qs_summary"
